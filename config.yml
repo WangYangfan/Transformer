@@ -1,0 +1,23 @@
+device: null
+num_shards: null
+name: null
+
+seed: 42
+max_length: 32
+batch_size: 16
+lr: !!float 3e-4
+num_train_epochs: 50
+num_epochs_save_model: 10
+checkpoint_zh: "google-bert/bert-base-chinese"
+checkpoint_en: "google-bert/bert-base-uncased"
+dataset_path: "./datasets/translate"
+log_path: "./log"
+cache_path: "./cache"
+output_path: "./output"
+
+# Transformer
+num_heads: 8
+num_layers: 2
+dropout: 0.1
+beam_size: 3
+top_k: 10
