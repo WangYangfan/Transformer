@@ -296,7 +296,7 @@ class Transformer(nn.Module):
             next_token_id = best_scores_id % vocab_size
             next_token_id_list = next_token_id.reshape(-1).tolist()
 
-            term = torch.tensor(range(batch_size), device=self.device).unsqueeze(1) * 2
+            term = torch.tensor(range(batch_size), device=self.device).unsqueeze(1) * self.beam_size
             old_idx = (inputs_zh_idx + term).reshape(-1).tolist()
             new_token_id = next_token_id.reshape(-1, 1)
             tgt_token_ids = torch.cat([tgt_token_ids[old_idx], new_token_id], dim=1)
@@ -304,23 +304,19 @@ class Transformer(nn.Module):
             # ids = []
             for j in range(batch_size):
                 if stop_flag[j] == -1:
-                    k = j * 2
-                    if next_token_id_list[k] == self.eos_id:
-                        count += 1
-                        stop_flag[j] = k
-                        # ids.append(k)
-                    elif next_token_id_list[k+1] == self.eos_id:
-                        count += 1
-                        stop_flag[j] = k + 1
-                        # ids.append(k+1)
-                    else:
-                        results[k].append(next_token_id_list[k])
-                        results[k+1].append(next_token_id_list[k+1])
+                    k = j * self.beam_size
+                    flag = False
+                    for p in range(k, k + self.beam_size):
+                        if next_token_id_list[p] == self.eos_id:
+                            count += 1
+                            stop_flag[j] = p
+                            flag = True
+                    if flag is False:
+                        for p in range(k, k + self.beam_size):
+                            results[p].append(next_token_id_list[p])
                 if count == batch_size:
                     break
-        # result = self.tokenizer_zh.decode(results[0], skip_special_tokens=False)
-        # print(f'beam search decode:\n{result}')
-        # assert len(ids) == batch_size
+                
         new_results = []
         for i in range(batch_size):
             if stop_flag[i] == -1:
