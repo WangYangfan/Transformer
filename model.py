@@ -200,7 +200,7 @@ class Transformer(nn.Module):
         src_token_ids = batch_src['input_ids']
         tgt_token_ids = batch_tgt['input_ids']
         src_pad_mask = (1 - batch_src['attention_mask']).bool()
-        tgt_pad_mask = (1 - batch_src['attention_mask']).bool()
+        tgt_pad_mask = (1 - batch_tgt['attention_mask']).bool()
         dec_len = self.max_length - 1
         attn_mask = (1 - torch.ones(dec_len, dec_len, device=self.device).tril()).bool()
 
